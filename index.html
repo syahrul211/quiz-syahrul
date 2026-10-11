@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b16">
+  <meta name="description" content="Quiz buatan sendiri — kuis teknologi interaktif dengan timer, pembahasan, dan leaderboard lokal.">
+  <title>Quiz buatan sendiri — Tech Quiz</title>
+  <style>
+    :root{--bg:#080b16;--panel:#11172a;--panel2:#151d34;--line:#26314d;--text:#eef3ff;--muted:#9ba9c8;--cyan:#58e6ff;--purple:#9b7bff;--green:#55e6a5;--red:#ff6b87;--radius:20px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 10% 0%,#17204a 0,transparent 38%),radial-gradient(ellipse at 100% 20%,#241746 0,transparent 35%),var(--bg)}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1080px,calc(100% - 32px));margin:auto;padding:28px 0 50px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.03em;font-size:1.15rem}
+    .logo{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;color:#08111b;background:linear-gradient(135deg,var(--cyan),var(--purple));box-shadow:0 0 28px #58e6ff25;font-size:1.2rem}
+    .tag{border:1px solid #2d3b5e;color:var(--cyan);padding:8px 12px;border-radius:999px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;align-items:stretch;margin-bottom:24px}
+    .panel{background:linear-gradient(145deg,#151c32ed,#0e1425f2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 20px 60px #00000024}
+    .hero-main{padding:clamp(24px,5vw,44px);position:relative;overflow:hidden}
+    .eyebrow{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:800}
+    h1{font-size:clamp(2.1rem,5vw,3.8rem);line-height:1.03;letter-spacing:-.055em;margin:16px 0}
+    h1 span{background:linear-gradient(90deg,var(--cyan),#b6a0ff);color:transparent;background-clip:text}
+    .intro{max-width:570px;color:var(--muted);line-height:1.7}
+    .hero-art{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:270px;padding:24px;text-align:center;overflow:hidden;position:relative}
+    .orb{width:138px;height:138px;border-radius:50%;display:grid;place-items:center;font-size:3rem;background:radial-gradient(circle at 35% 25%,#c8f9ff,#58e6ff 20%,#6756d8 62%,#17152e 72%);box-shadow:0 0 70px #8c79ff4d, inset -12px -12px 24px #080b1670;margin-bottom:20px}
+    .hero-art strong{font-size:1.05rem}.hero-art p{color:var(--muted);font-size:.88rem;margin-bottom:0}
+    .layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:24px;align-items:start}
+    .quiz-panel{padding:clamp(20px,3vw,30px)}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 20px;font-size:1.15rem}
+    .section-title small{font-size:.78rem;color:var(--muted);font-weight:500}
+    .field-label{display:block;color:#cbd6f0;font-size:.87rem;margin:18px 0 9px}
+    select,input[type=text]{width:100%;background:#0a1020;border:1px solid #2a3655;border-radius:12px;color:var(--text);padding:13px 14px;outline:none}
+    select:focus,input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #58e6ff18}
+    .btn{border:0;border-radius:12px;padding:13px 18px;font-weight:800;transition:transform .15s,filter .15s}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+    .primary{color:#07111b;background:linear-gradient(100deg,var(--cyan),#a4a0ff);box-shadow:0 8px 24px #58e6ff20}
+    .secondary{color:var(--text);background:#202a44;border:1px solid #344262}
+    .danger{color:#ffdbe3;background:#3b1e30;border:1px solid #6c3049}
+    .full{width:100%;margin-top:22px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
+    .stat{padding:15px 12px;background:#0b1121;border:1px solid #202b47;border-radius:14px}
+    .stat b{display:block;font-size:1.4rem;color:var(--cyan)}.stat span{font-size:.75rem;color:var(--muted)}
+    .side{display:grid;gap:20px}
+    .side .panel{padding:22px}
+    .side h2{font-size:1rem;margin:0 0 15px}
+    .muted{color:var(--muted)}
+    .leader-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+    .leader-list li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 12px;background:#0b1121;border:1px solid #202b47;border-radius:12px;font-size:.87rem}
+    .leader-list .rank{color:var(--purple);font-weight:900;margin-right:8px}
+    .leader-list strong{color:var(--green)}
+    .empty{font-size:.86rem;color:var(--muted);line-height:1.6}
+    .note{font-size:.78rem;color:var(--muted);line-height:1.55;margin:14px 0 0}
+    .hidden{display:none!important}
+    .quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .pill{padding:8px 11px;border:1px solid #2d3b5e;background:#0b1121;border-radius:999px;font-size:.82rem}
+    .timer{color:var(--cyan);font-weight:800}.timer.low{color:var(--red)}
+    .progress-track{height:7px;background:#222d49;border-radius:999px;overflow:hidden;margin:14px 0 24px}
+    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .25s}
+    .question-count{font-size:.78rem;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase}
+    .question{font-size:clamp(1.15rem,2.5vw,1.5rem);line-height:1.4;margin:12px 0 22px}
+    .answers{display:grid;gap:11px}
+    .answer{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:var(--text);background:#0b1121;border:1px solid #2a3655;border-radius:14px;padding:14px;line-height:1.45}
+    .answer:hover:not(:disabled){border-color:#6475a3;background:#131d35}
+    .answer .letter{flex:0 0 31px;height:31px;display:grid;place-items:center;border:1px solid #3a4767;border-radius:9px;color:#aab8d8;font-weight:800}
+    .answer.correct{border-color:var(--green);background:#102b2b}.answer.correct .letter{background:var(--green);color:#052018}
+    .answer.wrong{border-color:var(--red);background:#311c2b}.answer.wrong .letter{background:var(--red);color:#250914}
+    .explanation{margin-top:16px;padding:15px;border:1px solid #344262;background:#121c32;border-radius:13px;color:#cbd6f0;line-height:1.65;font-size:.9rem}
+    .explanation b{color:var(--cyan)}
+    .quiz-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
+    .result-score{font-size:3.4rem;font-weight:900;letter-spacing:-.06em;background:linear-gradient(90deg,var(--cyan),var(--purple));color:transparent;background-clip:text}
+    .result-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+    .result-summary .stat{text-align:center}
+    .result-summary .stat b{color:var(--text)}
+    .result-message{color:var(--muted);line-height:1.65}
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#eafcff;color:#07111b;border-radius:12px;padding:12px 16px;font-size:.88rem;font-weight:700;box-shadow:0 12px 36px #0006;z-index:10}
+    footer{text-align:center;color:#6f7d9d;font-size:.78rem;margin-top:28px;line-height:1.7}
+    @media(max-width:780px){.hero,.layout{grid-template-columns:1fr}.hero-art{min-height:220px}.orb{width:100px;height:100px;font-size:2.3rem}.tag{display:none}}
+    @media(max-width:460px){.wrap{width:min(100% - 20px,1080px);padding-top:18px}.brand{font-size:1rem}.logo{width:38px;height:38px}.hero-main{padding:24px}.stats,.result-summary{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}.quiz-actions{align-items:stretch;flex-direction:column-reverse}.quiz-actions .btn{width:100%}.quiz-top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo">⌘</div><span>Quiz buatan sendiri</span></div>
+    <div class="tag">● Tech knowledge arena</div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="panel hero-main">
+      <div class="eyebrow">LEVEL UP YOUR BRAIN</div>
+      <h1>Uji logika.<br><span>Taklukkan teknologi.</span></h1>
+      <p class="intro">Tantang pengetahuanmu tentang komputer, internet, keamanan digital, dan pemrograman. Jawab sebelum waktu habis, pelajari pembahasannya, lalu naik ke puncak leaderboard.</p>
+    </div>
+    <div class="panel hero-art">
+      <div class="orb">⌘</div>
+      <strong>Siap untuk tantangan?</strong>
+      <p>10 soal • Waktu terbatas • Skor langsung</p>
+    </div>
+  </section>
+
+  <main class="layout">
+    <section class="panel quiz-panel" id="setupPanel">
+      <h2 class="section-title">Mulai petualangan <small>01 / Setup</small></h2>
+      <label class="field-label" for="playerName">Nama pemain</label>
+      <input id="playerName" type="text" maxlength="24" placeholder="Masukkan nama kamu" autocomplete="nickname">
+      <label class="field-label" for="difficulty">Pilih tingkat kesulitan</label>
+      <select id="difficulty">
+        <option value="Mudah">Mudah — pemula</option>
+        <option value="Sedang" selected>Sedang — menantang</option>
+        <option value="Sulit">Sulit — level expert</option>
+      </select>
+      <div class="stats">
+        <div class="stat"><b>10</b><span>Soal per sesi</span></div>
+        <div class="stat"><b>15 dtk</b><span>Waktu per soal</span></div>
+        <div class="stat"><b>100</b><span>Skor maksimal</span></div>
+      </div>
+      <button class="btn primary full" id="startBtn">Mulai kuis <span aria-hidden="true">→</span></button>
+      <button class="btn secondary full hidden" id="resumeBtn">Lanjutkan progres tersimpan</button>
+      <p class="note">Progres dan leaderboard disimpan di browser perangkat ini. Data tidak otomatis tersinkron ke perangkat lain.</p>
+    </section>
+
+    <section class="panel quiz-panel hidden" id="quizPanel" aria-live="polite">
+      <div class="quiz-top">
+        <span class="pill" id="difficultyPill">Sedang</span>
+        <span class="pill timer" id="timer">⏱ 15 detik</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="question-count" id="questionCount">SOAL 1 DARI 10</div>
+      <h2 class="question" id="questionText"></h2>
+      <div class="answers" id="answers"></div>
+      <div class="explanation hidden" id="explanation" aria-live="polite"></div>
+      <div class="quiz-actions">
+        <span class="muted" id="answerStatus">Pilih satu jawaban</span>
+        <button class="btn primary hidden" id="nextBtn">Soal berikutnya →</button>
+      </div>
+    </section>
+
+    <section class="panel quiz-panel hidden" id="resultPanel" aria-live="polite">
+      <div class="eyebrow">SESSION COMPLETE</div>
+      <h2 class="section-title" style="margin-top:14px">Hasil kuis kamu <small>03 / Result</small></h2>
+      <div class="result-score" id="resultScore">0%</div>
+      <div class="result-message" id="resultMessage"></div>
+      <div class="result-summary">
+        <div class="stat"><b id="correctCount">0</b><span>Benar</span></div>
+        <div class="stat"><b id="wrongCount">0</b><span>Salah / kosong</span></div>
+        <div class="stat"><b id="timeUsed">0 dtk</b><span>Durasi</span></div>
+      </div>
+      <label class="field-label" for="reviewSelect">Lihat pembahasan soal</label>
+      <select id="reviewSelect"></select>
+      <div class="explanation" id="reviewExplanation"></div>
+      <button class="btn primary full" id="playAgainBtn">Main lagi</button>
+      <button class="btn secondary full" id="homeBtn">Kembali ke beranda</button>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>🏆 Leaderboard lokal</h2>
+        <ol class="leader-list" id="leaderboard"></ol>
+        <p class="note">Papan peringkat ini hanya berlaku pada browser yang sama. Untuk leaderboard online bersama semua pengguna, dibutuhkan backend atau layanan database.</p>
+        <button class="btn secondary full" id="clearBoardBtn" style="margin-top:14px">Hapus leaderboard</button>
+      </section>
+      <section class="panel">
+        <h2>⚡ Tips cepat</h2>
+        <p class="empty">Baca soal dengan teliti. Setiap jawaban benar bernilai 10 poin. Jika waktu habis, soal akan ditandai belum terjawab dan kuis berlanjut.</p>
+        <p class="note">Tingkat kesulitan menentukan kumpulan soal. Kamu bisa mengulang kuis untuk meningkatkan skor.</p>
+      </section>
+    </aside>
+  </main>
+  <footer>QUIZ BUATAN SENDIRI · Dibuat dengan HTML, CSS & JavaScript<br>Belajar hari ini, lebih siap menghadapi teknologi esok hari.</footer>
+</div>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<script>
+(() => {
+  "use strict";
+  const QUESTIONS = {
+    "Mudah": [
+      {q:"Apa kepanjangan dari CPU?",a:["Central Processing Unit","Computer Personal Utility","Core Program Upload","Central Power User"],c:0,e:"CPU adalah Central Processing Unit, komponen yang mengeksekusi instruksi dan mengoordinasikan banyak operasi komputer."},
+      {q:"Manakah yang termasuk browser web?",a:["Microsoft Excel","Google Chrome","Adobe Photoshop","Windows Defender"],c:1,e:"Google Chrome adalah browser untuk membuka dan menggunakan halaman web. Excel adalah aplikasi spreadsheet, Photoshop untuk pengolahan gambar, dan Defender untuk keamanan."},
+      {q:"Apa fungsi utama RAM pada komputer?",a:["Menyimpan file selamanya","Mencetak dokumen","Menyimpan data sementara saat program berjalan","Mendinginkan prosesor"],c:2,e:"RAM menyimpan data dan instruksi yang sedang digunakan agar CPU dapat mengaksesnya dengan cepat. Isinya umumnya hilang saat daya mati."},
+      {q:"Ekstensi file gambar yang umum adalah…",a:[".mp3",".jpg",".exe",".xlsx"],c:1,e:"JPG/JPEG adalah format gambar. MP3 adalah audio, EXE adalah berkas program Windows, dan XLSX adalah spreadsheet."},
+      {q:"Apa tujuan kata sandi yang kuat?",a:["Memudahkan orang menebak akun","Menggunakan nama sendiri saja","Memakai kata yang sama di semua situs","Mengurangi risiko akun diakses orang lain"],c:3,e:"Kata sandi unik dan kuat membantu mengurangi risiko pembobolan akun. Pengelola kata sandi dan autentikasi multifaktor menambah perlindungan."},
+      {q:"Perangkat mana yang digunakan untuk menggerakkan penunjuk di layar?",a:["Mouse","Router","Speaker","Scanner"],c:0,e:"Mouse adalah perangkat input penunjuk. Router menghubungkan jaringan, speaker mengeluarkan suara, dan scanner memindai dokumen."},
+      {q:"Apa kepanjangan dari Wi-Fi dalam penggunaan sehari-hari?",a:["Wired File","Wireless networking technology","Wide Finder","Web Finalizer"],c:1,e:"Wi-Fi merujuk pada teknologi jaringan nirkabel yang memungkinkan perangkat terhubung ke jaringan tanpa kabel. Istilah Wi-Fi bukan kepanjangan resmi dari frasa dalam opsi lain."},
+      {q:"Aplikasi spreadsheet biasanya digunakan untuk…",a:["Mengedit video saja","Mengelola tabel dan perhitungan","Mengganti sistem operasi","Membersihkan keyboard"],c:1,e:"Spreadsheet seperti Microsoft Excel atau Google Sheets membantu mengatur data berbentuk tabel, memakai rumus, dan membuat grafik."},
+      {q:"Apa yang dimaksud dengan mengunduh (download)?",a:["Mengirim file dari perangkat ke internet","Menghapus akun","Menerima atau menyalin data dari sistem lain ke perangkat","Mematikan jaringan"],c:2,e:"Download berarti mengambil data dari layanan atau perangkat lain ke perangkat lokal. Upload adalah mengirim data dari perangkat ke layanan lain."},
+      {q:"Manakah contoh perangkat penyimpanan?",a:["SSD","Mikrofon","Webcam","Touchpad"],c:0,e:"SSD menyimpan data secara persisten. Mikrofon dan webcam adalah perangkat input, sedangkan touchpad mengontrol penunjuk."}
+    ],
+    "Sedang": [
+      {q:"Apa fungsi utama DNS ketika kamu membuka situs menggunakan nama domain?",a:["Mengenkripsi semua file di komputer","Menerjemahkan nama domain menjadi alamat IP","Mempercepat kipas prosesor","Membuat kata sandi otomatis"],c:1,e:"DNS membantu menemukan alamat IP yang terkait dengan nama domain, sehingga perangkat dapat menghubungi server yang benar."},
+      {q:"Apa tujuan autentikasi multifaktor (MFA)?",a:["Menghapus kebutuhan semua kata sandi","Membuat internet selalu lebih cepat","Menambahkan lapisan verifikasi saat masuk","Menyimpan semua data di ruang publik"],c:2,e:"MFA meminta lebih dari satu jenis bukti untuk memverifikasi identitas, misalnya kata sandi dan kode dari aplikasi autentikator."},
+      {q:"Dalam Git, apa fungsi utama perintah `commit`?",a:["Merekam perubahan ke riwayat repositori","Menghapus seluruh cabang remote","Menerbitkan situs secara otomatis dalam semua keadaan","Mengganti bahasa pemrograman proyek"],c:0,e:"Commit merekam sekumpulan perubahan ke riwayat repositori Git beserta pesan penjelas. Publikasi situs biasanya membutuhkan langkah atau layanan deployment tersendiri."},
+      {q:"Apa perbedaan utama HTTP dan HTTPS?",a:["HTTPS hanya bisa dipakai untuk gambar","HTTP selalu lebih aman daripada HTTPS","HTTPS menggunakan TLS untuk melindungi koneksi","Keduanya tidak dapat mengirim teks"],c:2,e:"HTTPS menggunakan TLS untuk mengenkripsi koneksi dan membantu memverifikasi identitas server. HTTP biasa tidak menyediakan perlindungan TLS tersebut."},
+      {q:"Apa kegunaan CSS dalam pengembangan web?",a:["Mengatur tampilan dan tata letak halaman","Menyimpan database pengguna secara otomatis","Menggantikan server web","Menerjemahkan nama domain"],c:0,e:"CSS mengatur gaya visual seperti warna, tipografi, jarak, tata letak, dan responsivitas halaman web."},
+      {q:"Apa yang dimaksud dengan phishing?",a:["Teknik mendinginkan CPU","Upaya menipu orang agar memberikan data sensitif","Metode membuat cadangan data","Cara mengompres gambar"],c:1,e:"Phishing menggunakan pesan atau situs palsu untuk memancing korban memberikan informasi sensitif atau menjalankan tindakan berbahaya."},
+      {q:"Dalam JavaScript, apa hasil dari `typeof 42`?",a:["number","integer","text","undefined"],c:0,e:"Operator typeof pada angka 42 menghasilkan string 'number'. JavaScript tidak memiliki tipe primitif terpisah bernama integer."},
+      {q:"Mengapa backup data penting?",a:["Agar monitor lebih cerah","Untuk menghapus kebutuhan pembaruan","Untuk memulihkan data setelah hilang atau rusak","Agar semua situs bebas iklan"],c:2,e:"Cadangan memungkinkan pemulihan ketika data terhapus, perangkat rusak, atau terjadi insiden keamanan. Backup sebaiknya diuji dan disimpan secara aman."},
+      {q:"Apa peran API dalam pengembangan perangkat lunak?",a:["Membuat baterai tahan selamanya","Memungkinkan sistem perangkat lunak saling berkomunikasi melalui aturan tertentu","Menggantikan semua antarmuka pengguna","Menyimpan file hanya di RAM"],c:1,e:"API mendefinisikan cara satu perangkat lunak meminta layanan atau bertukar data dengan perangkat lunak lain."},
+      {q:"Apa arti desain web responsif?",a:["Halaman menyesuaikan tata letak dengan ukuran layar","Situs hanya bisa dibuka di desktop","Semua teks harus bergerak","Situs tidak membutuhkan HTML"],c:0,e:"Desain responsif membuat tampilan dan tata letak beradaptasi dengan berbagai ukuran layar, dari ponsel hingga desktop."}
+    ],
+    "Sulit": [
+      {q:"Apa karakteristik utama hash kriptografis yang aman untuk verifikasi integritas?",a:["Dapat dibalik dengan kunci publik","Menghasilkan ringkasan tetap dan sulit mencari input berbeda dengan hash yang sama","Selalu menghasilkan hash lebih pendek dari 4 bit","Mengubah file asli agar tidak dapat dibuka"],c:1,e:"Fungsi hash kriptografis menghasilkan digest berukuran tetap dan dirancang agar sulit menemukan preimage atau collision. Hash bukan enkripsi dan tidak dirancang untuk dibalik."},
+      {q:"Apa tujuan utama prinsip least privilege dalam keamanan sistem?",a:["Memberi semua pengguna akses administrator","Menghapus semua log keamanan","Memberikan hak akses minimum yang diperlukan untuk tugas","Menggunakan satu akun bersama untuk semua orang"],c:2,e:"Least privilege membatasi hak akses sesuai kebutuhan tugas sehingga dampak kesalahan atau kompromi akun dapat diperkecil."},
+      {q:"Dalam Git, apa fungsi branch?",a:["Membuat jalur pengembangan terpisah dari jalur utama","Mengenkripsi seluruh repositori","Menghapus riwayat commit secara otomatis","Mengubah kode menjadi gambar"],c:0,e:"Branch memungkinkan pekerjaan dikembangkan secara terpisah sehingga perubahan dapat ditinjau dan digabungkan kemudian."},
+      {q:"Apa risiko utama menyimpan kata sandi dalam teks biasa di database?",a:["Database menjadi terlalu cepat","Kata sandi tidak dapat dibaca server","Jika database bocor, kata sandi langsung terbaca","Pengguna otomatis memakai MFA"],c:2,e:"Kata sandi seharusnya disimpan menggunakan password hashing yang dirancang khusus, dengan salt unik dan parameter yang sesuai, bukan teks biasa."},
+      {q:"Apa fungsi indeks pada database relasional?",a:["Menghapus kebutuhan validasi data","Membantu mempercepat pencarian tertentu dengan struktur tambahan","Menjamin setiap query selalu tercepat","Mengubah database menjadi gambar"],c:1,e:"Indeks dapat mempercepat pencarian dan pengurutan tertentu, tetapi memakai ruang tambahan dan dapat menambah biaya saat data diubah."},
+      {q:"Apa perbedaan utama concurrency dan parallelism?",a:["Keduanya selalu berarti satu instruksi pada satu waktu","Concurrency mengatur banyak tugas yang saling tumpang tindih; parallelism menjalankan tugas secara bersamaan","Parallelism hanya berlaku untuk CSS","Concurrency selalu memerlukan banyak komputer"],c:1,e:"Concurrency berhubungan dengan pengelolaan beberapa tugas yang progresnya saling tumpang tindih. Parallelism berarti beberapa pekerjaan benar-benar berjalan pada saat yang sama."},
+      {q:"Mengapa validasi input tetap perlu dilakukan di sisi server?",a:["Validasi browser tidak dapat dilewati","Karena server tidak menerima data dari browser","Agar situs tidak membutuhkan HTTPS","Agar pengguna tidak bisa mengubah ukuran layar"],c:0,e:"Validasi di browser membantu pengalaman pengguna, tetapi dapat dilewati atau dimanipulasi. Server harus memeriksa data sebelum memprosesnya."},
+      {q:"Apa tujuan utama container seperti Docker?",a:["Menggantikan semua sistem operasi host","Membuat aplikasi dan dependensinya berjalan dalam lingkungan terisolasi yang konsisten","Menyimpan semua data hanya di cloud publik","Menghapus kebutuhan pengujian"],c:1,e:"Container mengemas aplikasi beserta dependensinya dan menggunakan isolasi tingkat sistem operasi, sehingga perilaku lingkungan lebih konsisten."},
+      {q:"Dalam model relasional, apa yang umumnya dijamin oleh primary key?",a:["Nilainya unik dan tidak NULL untuk setiap baris","Semua kolom harus berisi teks","Tabel hanya boleh memiliki satu baris","Data otomatis dienkripsi"],c:0,e:"Primary key mengidentifikasi setiap baris secara unik; nilai primary key tidak boleh NULL."},
+      {q:"Apa manfaat utama Content Security Policy (CSP) yang dikonfigurasi dengan tepat?",a:["Menggantikan semua pembaruan keamanan","Menambah pertahanan terhadap sejumlah serangan injeksi konten, termasuk XSS","Menjamin situs tidak pernah diretas","Membuat semua gambar lebih tajam"],c:1,e:"CSP membatasi sumber konten yang boleh dimuat atau dijalankan browser. Konfigurasi yang tepat dapat mengurangi dampak beberapa serangan, tetapi bukan jaminan keamanan mutlak."}
+    ]
+  };
+
+  const $ = id => document.getElementById(id);
+  const STORAGE = {progress:"quizbuatan_progress_v1",board:"quizbuatan_board_v1"};
+  let state = null;
+  let timerId = null;
+  let toastId = null;
+  let questionStartedAt = 0;
+
+  function safeRead(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
+  }
+  function safeWrite(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+    catch { showToast("Penyimpanan browser tidak tersedia."); return false; }
+  }
+  function showToast(message) {
+    const el = $("toast"); el.textContent = message; el.classList.remove("hidden");
+    clearTimeout(toastId); toastId = setTimeout(() => el.classList.add("hidden"), 2600);
+  }
+  function showPanel(id) {
+    ["setupPanel","quizPanel","resultPanel"].forEach(x => $(x).classList.toggle("hidden", x !== id));
+    $("hero").classList.toggle("hidden", id !== "setupPanel");
+  }
+  function shuffledQuestions(difficulty) {
+    return QUESTIONS[difficulty].map((item, index) => ({...item, originalIndex:index}));
+  }
+  function startQuiz() {
+    const name = $("playerName").value.trim() || "Pemain";
+    const difficulty = $("difficulty").value;
+    state = {name, difficulty, questions:shuffledQuestions(difficulty), index:0, answers:[], startedAt:Date.now(), remaining:15, answered:false, timedOut:false};
+    safeWrite(STORAGE.progress, state);
+    showPanel("quizPanel"); renderQuestion();
+  }
+  function resumeQuiz() {
+    const saved = safeRead(STORAGE.progress, null);
+    if (!saved || !saved.questions || saved.index >= saved.questions.length) { showToast("Tidak ada progres yang bisa dilanjutkan."); return; }
+    state = saved;
+    state.remaining = Math.max(1, Math.min(15, Number(state.remaining) || 15));
+    $("playerName").value = state.name || "";
+    $("difficulty").value = state.difficulty || "Sedang";
+    showPanel("quizPanel"); renderQuestion();
+  }
+  function persistProgress() { if (state) safeWrite(STORAGE.progress, state); }
+  function renderQuestion() {
+    clearInterval(timerId);
+    if (!state || state.index >= state.questions.length) return finishQuiz();
+    const q = state.questions[state.index];
+    state.answered = Boolean(state.answers[state.index]);
+    state.timedOut = Boolean(state.answers[state.index] && state.answers[state.index].timedOut);
+    $("difficultyPill").textContent = state.difficulty;
+    $("questionCount").textContent = `SOAL ${state.index+1} DARI ${state.questions.length}`;
+    $("progressFill").style.width = `${(state.index/state.questions.length)*100}%`;
+    $("questionText").textContent = q.q;
+    $("answers").innerHTML = "";
+    $("explanation").classList.add("hidden");
+    $("nextBtn").classList.add("hidden");
+    $("answerStatus").textContent = "Pilih satu jawaban";
+    q.a.forEach((answer, i) => {
+      const btn = document.createElement("button");
+      btn.className = "answer";
+      btn.type = "button";
+      const letter = document.createElement("span"); letter.className = "letter"; letter.textContent = String.fromCharCode(65+i);
+      const label = document.createElement("span"); label.textContent = answer;
+      btn.append(letter,label); btn.addEventListener("click", () => chooseAnswer(i, false));
+      $("answers").appendChild(btn);
+    });
+    questionStartedAt = Date.now();
+    if (state.answered) {
+      const answer = state.answers[state.index];
+      revealAnswer(answer.choice, answer.timedOut, true);
+    } else {
+      startTimer();
+    }
+    persistProgress();
+  }
+  function startTimer() {
+    clearInterval(timerId);
+    let remaining = Number(state.remaining) || 15;
+    updateTimer(remaining);
+    timerId = setInterval(() => {
+      remaining--;
+      state.remaining = remaining;
+      updateTimer(remaining);
+      persistProgress();
+      if (remaining <= 0) {
+        clearInterval(timerId);
+        chooseAnswer(-1, true);
+      }
+    }, 1000);
+  }
+  function updateTimer(seconds) {
+    $("timer").textContent = `⏱ ${Math.max(0,seconds)} detik`;
+    $("timer").classList.toggle("low", seconds <= 5);
+  }
+  function chooseAnswer(choice, timedOut) {
+    if (!state || state.answered) return;
+    clearInterval(timerId);
+    state.answered = true; state.timedOut = timedOut;
+    state.answers[state.index] = {choice, timedOut, secondsUsed:Math.max(0, Math.round((Date.now()-questionStartedAt)/1000))};
+    revealAnswer(choice, timedOut, false);
+    persistProgress();
+  }
+  function revealAnswer(choice, timedOut, fromSaved) {
+    const q = state.questions[state.index];
+    const buttons = [...$("answers").querySelectorAll("button")];
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.c) btn.classList.add("correct");
+      if (i === choice && choice !== q.c) btn.classList.add("wrong");
+    });
+    $("explanation").innerHTML = `<b>${timedOut ? "Waktu habis." : choice === q.c ? "Jawaban benar!" : "Belum tepat."}</b> ${escapeHTML(q.e)}`;
+    $("explanation").classList.remove("hidden");
+    $("answerStatus").textContent = timedOut ? "Tidak ada jawaban dipilih" : choice === q.c ? "+10 poin" : "0 poin";
+    $("nextBtn").textContent = state.index === state.questions.length-1 ? "Lihat hasil →" : "Soal berikutnya →";
+    $("nextBtn").classList.remove("hidden");
+    $("progressFill").style.width = `${((state.index+1)/state.questions.length)*100}%`;
+    updateTimer(state.remaining);
+  }
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  }
+  function nextQuestion() {
+    if (!state || !state.answered) return;
+    state.index++;
+    state.remaining = 15;
+    if (state.index >= state.questions.length) finishQuiz();
+    else renderQuestion();
+    persistProgress();
+  }
+  function finishQuiz() {
+    clearInterval(timerId);
+    if (!state) return;
+    const total = state.questions.length;
+    const correct = state.questions.reduce((sum,q,i) => sum + (state.answers[i] && state.answers[i].choice === q.c ? 1 : 0),0);
+    const score = Math.round(correct/total*100);
+    const elapsed = Math.round((Date.now()-state.startedAt)/1000);
+    $("resultScore").textContent = `${score}%`;
+    $("correctCount").textContent = correct;
+    $("wrongCount").textContent = total-correct;
+    $("timeUsed").textContent = `${elapsed} dtk`;
+    $("resultMessage").textContent = score === 100 ? "Sempurna! Pengetahuan teknologimu luar biasa." : score >= 70 ? "Kerja bagus! Kamu sudah menguasai banyak konsep teknologi." : score >= 40 ? "Awal yang baik. Baca pembahasan dan coba lagi untuk meningkatkan skor." : "Terus belajar! Setiap percobaan adalah kesempatan untuk berkembang.";
+    const review = $("reviewSelect"); review.innerHTML = "";
+    state.questions.forEach((q,i) => {
+      const opt = document.createElement("option"); opt.value = i;
+      opt.textContent = `Soal ${i+1} — ${state.answers[i] && state.answers[i].choice === q.c ? "Benar" : "Perlu dipelajari"}`;
+      review.appendChild(opt);
+    });
+    renderReview(0);
+    const board = safeRead(STORAGE.board, []);
+    board.push({name:state.name,score,difficulty:state.difficulty,date:new Date().toISOString()});
+    board.sort((a,b) => b.score-a.score || new Date(a.date)-new Date(b.date));
+    safeWrite(STORAGE.board, board.slice(0,10));
+    try { localStorage.removeItem(STORAGE.progress); } catch {}
+    renderLeaderboard(); showPanel("resultPanel");
+  }
+  function renderReview(index) {
+    if (!state) return;
+    const q = state.questions[index];
+    const ans = state.answers[index] || {choice:-1,timedOut:true};
+    const given = ans.choice < 0 ? "Tidak dijawab" : q.a[ans.choice];
+    $("reviewExplanation").innerHTML = `<b>Jawaban kamu:</b> ${escapeHTML(given)}<br><b>Jawaban benar:</b> ${escapeHTML(q.a[q.c])}<br><br>${escapeHTML(q.e)}`;
+  }
+  function renderLeaderboard() {
+    const board = safeRead(STORAGE.board, []);
+    const list = $("leaderboard"); list.innerHTML = "";
+    if (!board.length) {
+      const li = document.createElement("li"); li.className = "empty"; li.textContent = "Belum ada skor. Jadilah pemain pertama!"; list.appendChild(li); return;
+    }
+    board.slice(0,10).forEach((item,i) => {
+      const li = document.createElement("li");
+      const name = document.createElement("span"); name.innerHTML = `<span class="rank">#${i+1}</span>${escapeHTML(item.name)} <small class="muted">· ${escapeHTML(item.difficulty)}</small>`;
+      const score = document.createElement("strong"); score.textContent = `${item.score}%`;
+      li.append(name,score); list.appendChild(li);
+    });
+  }
+  function resetToHome() {
+    clearInterval(timerId); state = null; showPanel("setupPanel");
+    const saved = safeRead(STORAGE.progress, null);
+    $("resumeBtn").classList.toggle("hidden", !saved);
+  }
+  $("startBtn").addEventListener("click", startQuiz);
+  $("resumeBtn").addEventListener("click", resumeQuiz);
+  $("nextBtn").addEventListener("click", nextQuestion);
+  $("reviewSelect").addEventListener("change", e => renderReview(Number(e.target.value)));
+  $("playAgainBtn").addEventListener("click", () => { $("playerName").value = state ? state.name : ""; startQuiz(); });
+  $("homeBtn").addEventListener("click", resetToHome);
+  $("clearBoardBtn").addEventListener("click", () => {
+    if (confirm("Yakin ingin menghapus semua skor leaderboard di browser ini?")) {
+      safeWrite(STORAGE.board, []); renderLeaderboard(); showToast("Leaderboard berhasil dihapus.");
+    }
+  });
+  $("playerName").addEventListener("keydown", e => { if (e.key === "Enter") startQuiz(); });
+  renderLeaderboard();
+  const saved = safeRead(STORAGE.progress, null);
+  if (saved && saved.questions && saved.index < saved.questions.length) $("resumeBtn").classList.remove("hidden");
+})();
+</script>
+</body>
+</html>
