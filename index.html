@@ -75,10 +75,40 @@
     .result-summary .stat{text-align:center}
     .result-summary .stat b{color:var(--text)}
     .result-message{color:var(--muted);line-height:1.65}
+    .sound-toggle{display:flex;align-items:center;gap:9px;margin-top:16px;color:var(--muted);font-size:.9rem;cursor:pointer}
+    .sound-toggle input{accent-color:var(--cyan);width:17px;height:17px}
+    .result-medal{font-size:3rem;margin:8px 0 0;animation:medalPop .6s cubic-bezier(.2,1.5,.5,1) both}
+    .result-progress-track{height:10px;background:#222d49;border-radius:999px;overflow:hidden;margin:18px 0 8px}
+    .result-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:999px;transition:width 1s ease}
+    .answer{animation:answerIn .35s both}
+    .answer:nth-child(2){animation-delay:.04s}.answer:nth-child(3){animation-delay:.08s}.answer:nth-child(4){animation-delay:.12s}
+    .panel{animation:panelIn .45s ease both}
+    @keyframes panelIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes answerIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes medalPop{from{opacity:0;transform:scale(.5) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+    @keyframes scoreGlow{0%,100%{filter:drop-shadow(0 0 0 #58e6ff00)}50%{filter:drop-shadow(0 0 16px #58e6ff55)}}
+    .result-score{animation:scoreGlow 2s ease-in-out infinite}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#eafcff;color:#07111b;border-radius:12px;padding:12px 16px;font-size:.88rem;font-weight:700;box-shadow:0 12px 36px #0006;z-index:10}
     footer{text-align:center;color:#6f7d9d;font-size:.78rem;margin-top:28px;line-height:1.7}
     @media(max-width:780px){.hero,.layout{grid-template-columns:1fr}.hero-art{min-height:220px}.orb{width:100px;height:100px;font-size:2.3rem}.tag{display:none}}
     @media(max-width:460px){.wrap{width:min(100% - 20px,1080px);padding-top:18px}.brand{font-size:1rem}.logo{width:38px;height:38px}.hero-main{padding:24px}.stats,.result-summary{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}.quiz-actions{align-items:stretch;flex-direction:column-reverse}.quiz-actions .btn{width:100%}.quiz-top{align-items:flex-start;flex-direction:column}}
+
+    /* Fitur tambahan: profil, XP, dan tema */
+    .feature-bar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 20px}
+    .feature-chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;padding:10px 13px;font-weight:700}
+    .profile-row{display:grid;grid-template-columns:76px 1fr;gap:14px;align-items:center}
+    .avatar-select{font-size:1.5rem;text-align:center}
+    .xp-track{height:8px;border-radius:99px;background:#27324e;overflow:hidden;margin:8px 0}
+    .xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .4s}
+    .feature-panel{padding:20px;margin-bottom:18px}
+    .feature-panel h2{margin-top:0}
+    .field-input{width:100%;background:#0a1020;border:1px solid #2a3655;border-radius:12px;color:var(--text);padding:12px}
+    body.light-theme{--bg:#eef3ff;--panel:#fff;--panel2:#f3f6ff;--line:#d7dfef;--text:#17213b;--muted:#5d6b87;--cyan:#087eaa;--purple:#7451ce;--green:#16865c;--red:#cf3457;background:radial-gradient(ellipse at 10% 0%,#dce9ff 0,transparent 38%),radial-gradient(ellipse at 100% 20%,#eee2ff 0,transparent 35%),var(--bg)}
+    body.light-theme .panel{background:linear-gradient(145deg,#ffffffed,#f6f8fff2);box-shadow:0 20px 60px #20345a12}
+    body.light-theme select,body.light-theme input[type=text],body.light-theme .field-input{background:#fff;color:var(--text);border-color:#cbd5e8}
+    body.light-theme .feature-chip{background:#fff}
+    @media(max-width:600px){.feature-bar>*{flex:1}}
   </style>
 </head>
 <body>
@@ -101,6 +131,27 @@
     </div>
   </section>
 
+
+  <div class="feature-bar" aria-label="Fitur pemain">
+    <button class="feature-chip" id="themeBtn" type="button">🌗 Ganti tema</button>
+    <button class="feature-chip" id="dailyBtn" type="button">📅 Tantangan harian: OFF</button>
+    <button class="feature-chip" id="profileBtn" type="button">👤 Profil pemain</button>
+  </div>
+  <section class="panel feature-panel" id="profilePanel">
+    <h2>👾 Profil & progres</h2>
+    <div class="profile-row">
+      <select id="playerAvatar" class="field-input avatar-select" aria-label="Pilih avatar">
+        <option value="😎">😎</option><option value="🤖">🤖</option><option value="👾">👾</option><option value="🦊">🦊</option><option value="🐼">🐼</option><option value="🚀">🚀</option><option value="🧙">🧙</option><option value="🐱">🐱</option>
+      </select>
+      <div>
+        <strong id="profileDisplayName">Pemain</strong>
+        <div class="muted" id="profileLevel">Level 1 · 0 XP</div>
+        <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        <small class="muted" id="xpNext">0 / 100 XP menuju level berikutnya</small>
+      </div>
+    </div>
+    <p class="note" id="dailyStatus">Tantangan harian memberi bonus XP sekali sehari. Progres XP dan streak tersimpan di browser ini.</p>
+  </section>
   <main class="layout">
     <section class="panel quiz-panel" id="setupPanel">
       <h2 class="section-title">Mulai petualangan <small>01 / Setup</small></h2>
@@ -112,6 +163,16 @@
         <option value="Sedang" selected>Sedang — menantang</option>
         <option value="Sulit">Sulit — level expert</option>
       </select>
+      <label class="field-label" for="category">Pilih kategori soal</label>
+      <select id="category">
+        <option value="Semua">Semua kategori</option>
+        <option value="Hardware">Hardware & Perangkat</option>
+        <option value="Jaringan">Jaringan & Internet</option>
+        <option value="Pemrograman">Pemrograman & Web</option>
+        <option value="Keamanan">Keamanan Digital</option>
+        <option value="Data">Data & Sistem</option>
+      </select>
+      <label class="sound-toggle"><input id="soundEnabled" type="checkbox" checked> <span>🔊 Efek suara</span></label>
       <div class="stats">
         <div class="stat"><b>10</b><span>Soal per sesi</span></div>
         <div class="stat"><b>15 dtk</b><span>Waktu per soal</span></div>
@@ -119,7 +180,7 @@
       </div>
       <button class="btn primary full" id="startBtn">Mulai kuis <span aria-hidden="true">→</span></button>
       <button class="btn secondary full hidden" id="resumeBtn">Lanjutkan progres tersimpan</button>
-      <p class="note">Progres dan leaderboard disimpan di browser perangkat ini. Data tidak otomatis tersinkron ke perangkat lain.</p>
+      <p class="note">Progres dan XP lokal tersimpan di browser. Leaderboard online aktif setelah konfigurasi Firebase dilengkapi.</p>
     </section>
 
     <section class="panel quiz-panel hidden" id="quizPanel" aria-live="polite">
@@ -141,8 +202,10 @@
     <section class="panel quiz-panel hidden" id="resultPanel" aria-live="polite">
       <div class="eyebrow">SESSION COMPLETE</div>
       <h2 class="section-title" style="margin-top:14px">Hasil kuis kamu <small>03 / Result</small></h2>
+      <div class="result-medal" id="resultMedal">✨</div>
       <div class="result-score" id="resultScore">0%</div>
       <div class="result-message" id="resultMessage"></div>
+      <div class="result-progress-track"><div class="result-progress-fill" id="resultProgressFill"></div></div>
       <div class="result-summary">
         <div class="stat"><b id="correctCount">0</b><span>Benar</span></div>
         <div class="stat"><b id="wrongCount">0</b><span>Salah / kosong</span></div>
@@ -157,9 +220,9 @@
 
     <aside class="side">
       <section class="panel">
-        <h2>🏆 Leaderboard lokal</h2>
+        <h2>🏆 Leaderboard</h2>
         <ol class="leader-list" id="leaderboard"></ol>
-        <p class="note">Papan peringkat ini hanya berlaku pada browser yang sama. Untuk leaderboard online bersama semua pengguna, dibutuhkan backend atau layanan database.</p>
+        <p class="note" id="leaderboardStatus">Leaderboard lokal aktif. Hubungkan Firebase untuk berbagi skor secara online.</p>
         <button class="btn secondary full" id="clearBoardBtn" style="margin-top:14px">Hapus leaderboard</button>
       </section>
       <section class="panel">
@@ -221,6 +284,31 @@
   let timerId = null;
   let toastId = null;
   let questionStartedAt = 0;
+  let audioContext = null;
+
+  function playTone(frequency, duration, type = "sine", volume = 0.045) {
+    if (!$("soundEnabled") || !$("soundEnabled").checked) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      audioContext = audioContext || new AudioCtx();
+      if (audioContext.state === "suspended") audioContext.resume();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(volume, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+      oscillator.connect(gain); gain.connect(audioContext.destination);
+      oscillator.start(); oscillator.stop(audioContext.currentTime + duration);
+    } catch (_) { /* Audio tidak tersedia; kuis tetap berjalan. */ }
+  }
+  function playSound(kind) {
+    if (kind === "correct") { playTone(660, .12); setTimeout(() => playTone(880, .16), 90); }
+    else if (kind === "wrong") { playTone(220, .18, "triangle", .035); }
+    else if (kind === "finish") { playTone(523, .13); setTimeout(() => playTone(659, .13), 110); setTimeout(() => playTone(784, .22), 220); }
+    else if (kind === "click") playTone(440, .06, "sine", .025);
+  }
 
   function safeRead(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -238,13 +326,46 @@
     ["setupPanel","quizPanel","resultPanel"].forEach(x => $(x).classList.toggle("hidden", x !== id));
     $("hero").classList.toggle("hidden", id !== "setupPanel");
   }
-  function shuffledQuestions(difficulty) {
-    return QUESTIONS[difficulty].map((item, index) => ({...item, originalIndex:index}));
+  function categoryForQuestion(item) {
+    const text = (item.q + " " + item.e + " " + item.a.join(" ")).toLowerCase();
+    if (/phishing|kata sandi|password|mfa|autentikasi|hash kriptografis|least privilege|keamanan|csp|xss|enkripsi|tls/.test(text)) return "Keamanan";
+    if (/dns|domain|ip address|alamat ip|http|https|internet|wi-fi|wifi|jaringan|router|browser|download|upload|api/.test(text)) return "Jaringan";
+    if (/css|html|javascript|\bjava\b|git|commit|branch|program|container|docker|responsif|web development|typeof/.test(text)) return "Pemrograman";
+    if (/cpu|ram|ssd|mouse|mikrofon|webcam|touchpad|prosesor|hardware|perangkat|monitor|spreadsheet|excel/.test(text)) return "Hardware";
+    return "Data";
+  }
+  function shuffledQuestions(difficulty, category) {
+    const all = QUESTIONS[difficulty]
+      .map((item, index) => ({...item, originalIndex:index, category:categoryForQuestion(item)}));
+    let pool;
+    if (category === "Semua") {
+      pool = [...all];
+    } else {
+      // Utamakan kategori yang dipilih. Jika koleksinya belum mencapai 10,
+      // tambahkan soal kategori lain agar setiap sesi tetap berisi 10 soal.
+      const focused = all.filter(item => item.category === category);
+      const others = all.filter(item => item.category !== category);
+      pool = [...focused];
+      for (let i = others.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [others[i], others[j]] = [others[j], others[i]];
+      }
+      pool.push(...others.slice(0, Math.max(0, 10 - pool.length)));
+    }
+    // Acak urutan agar soal tidak selalu tampil dalam urutan yang sama.
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    return pool.slice(0, 10);
   }
   function startQuiz() {
     const name = $("playerName").value.trim() || "Pemain";
     const difficulty = $("difficulty").value;
-    state = {name, difficulty, questions:shuffledQuestions(difficulty), index:0, answers:[], startedAt:Date.now(), remaining:15, answered:false, timedOut:false};
+    const category = $("category").value;
+    const questions = shuffledQuestions(difficulty, category);
+    if (!questions.length) { showToast("Belum ada soal untuk kategori ini pada tingkat tersebut. Pilih Semua kategori atau tingkat lain."); return; }
+    state = {name, difficulty, category, questions, index:0, answers:[], startedAt:Date.now(), remaining:15, answered:false, timedOut:false};
     safeWrite(STORAGE.progress, state);
     showPanel("quizPanel"); renderQuestion();
   }
@@ -255,6 +376,8 @@
     state.remaining = Math.max(1, Math.min(15, Number(state.remaining) || 15));
     $("playerName").value = state.name || "";
     $("difficulty").value = state.difficulty || "Sedang";
+    if ($("category")) $("category").value = state.category || "Semua";
+    if ($("category")) $("category").value = state.category || "Semua";
     showPanel("quizPanel"); renderQuestion();
   }
   function persistProgress() { if (state) safeWrite(STORAGE.progress, state); }
@@ -264,7 +387,7 @@
     const q = state.questions[state.index];
     state.answered = Boolean(state.answers[state.index]);
     state.timedOut = Boolean(state.answers[state.index] && state.answers[state.index].timedOut);
-    $("difficultyPill").textContent = state.difficulty;
+    $("difficultyPill").textContent = state.difficulty + (state.category && state.category !== "Semua" ? " · " + state.category : "");
     $("questionCount").textContent = `SOAL ${state.index+1} DARI ${state.questions.length}`;
     $("progressFill").style.width = `${(state.index/state.questions.length)*100}%`;
     $("questionText").textContent = q.q;
@@ -315,6 +438,7 @@
     state.answered = true; state.timedOut = timedOut;
     state.answers[state.index] = {choice, timedOut, secondsUsed:Math.max(0, Math.round((Date.now()-questionStartedAt)/1000))};
     revealAnswer(choice, timedOut, false);
+    if (!timedOut) playSound(choice === state.questions[state.index].c ? "correct" : "wrong");
     persistProgress();
   }
   function revealAnswer(choice, timedOut, fromSaved) {
@@ -352,6 +476,8 @@
     const score = Math.round(correct/total*100);
     const elapsed = Math.round((Date.now()-state.startedAt)/1000);
     $("resultScore").textContent = `${score}%`;
+    $("resultProgressFill").style.width = `${score}%`;
+    $("resultMedal").textContent = score === 100 ? "🏆" : score >= 70 ? "🥇" : score >= 40 ? "🎯" : "💡";
     $("correctCount").textContent = correct;
     $("wrongCount").textContent = total-correct;
     $("timeUsed").textContent = `${elapsed} dtk`;
@@ -368,7 +494,7 @@
     board.sort((a,b) => b.score-a.score || new Date(a.date)-new Date(b.date));
     safeWrite(STORAGE.board, board.slice(0,10));
     try { localStorage.removeItem(STORAGE.progress); } catch {}
-    renderLeaderboard(); showPanel("resultPanel");
+    renderLeaderboard(); showPanel("resultPanel"); playSound("finish");
   }
   function renderReview(index) {
     if (!state) return;
@@ -407,10 +533,125 @@
     }
   });
   $("playerName").addEventListener("keydown", e => { if (e.key === "Enter") startQuiz(); });
+
+  // Fitur XP, combo, tantangan harian, tema, dan profil
+  const PROFILE_KEY = "quizSyahrulPlayerProfileV1";
+  const DAILY_KEY = "quizSyahrulDailyV1";
+  let dailyMode = false;
+  let currentCombo = 0;
+  let bestCombo = 0;
+  function getProfile(){ return safeRead(PROFILE_KEY,{name:"Pemain",avatar:"😎",xp:0,streak:0,lastDaily:""}); }
+  function saveProfile(profile){ safeWrite(PROFILE_KEY,profile); renderProfile(); }
+  function renderProfile(){
+    const p=getProfile(); const name=$("playerName").value.trim() || p.name || "Pemain";
+    $("profileDisplayName").textContent=`${p.avatar||"😎"} ${name}`;
+    const level=Math.floor((p.xp||0)/100)+1, within=(p.xp||0)%100;
+    $("profileLevel").textContent=`Level ${level} · ${p.xp||0} XP · 🔥 Streak ${p.streak||0}`;
+    $("xpFill").style.width=`${within}%`; $("xpNext").textContent=`${within} / 100 XP menuju level ${level+1}`;
+    $("playerAvatar").value=p.avatar||"😎";
+  }
+  $("playerAvatar").addEventListener("change",()=>{const p=getProfile();p.avatar=$("playerAvatar").value;saveProfile(p);});
+  $("playerName").addEventListener("input",renderProfile);
+  $("themeBtn").addEventListener("click",()=>{
+    document.body.classList.toggle("light-theme");
+    const light=document.body.classList.contains("light-theme");
+    safeWrite("quizSyahrulThemeV1",light?"light":"dark");
+    $("themeBtn").textContent=light?"🌙 Tema gelap":"☀️ Tema terang";
+  });
+  if(safeRead("quizSyahrulThemeV1","dark")==="light"){document.body.classList.add("light-theme");$("themeBtn").textContent="🌙 Tema gelap";}
+  $("dailyBtn").addEventListener("click",()=>{
+    dailyMode=!dailyMode;
+    $("dailyBtn").textContent=`📅 Tantangan harian: ${dailyMode?"ON":"OFF"}`;
+    $("dailyStatus").textContent=dailyMode?"Mode tantangan harian aktif. Selesaikan kuis hari ini untuk bonus 25 XP pertama kali.":"Tantangan harian nonaktif.";
+    showToast(dailyMode?"Tantangan harian diaktifkan!":"Mode tantangan harian dimatikan.");
+  });
+  $("profileBtn").addEventListener("click",()=>{$("profilePanel").classList.toggle("hidden");});
+  // XP and combo are awarded only after a completed quiz.
+  const oldChooseAnswer=chooseAnswer;
+  chooseAnswer=function(choice,timedOut){
+    if(!state||state.answered)return;
+    oldChooseAnswer(choice,timedOut);
+    if(choice===state.questions[state.index].c && !timedOut){currentCombo++;bestCombo=Math.max(bestCombo,currentCombo);}
+    else currentCombo=0;
+    $("answerStatus").textContent += ` · 🔥 Combo ${currentCombo}`;
+  };
+  const oldFinishQuiz=finishQuiz;
+  finishQuiz=function(){
+    if(!state)return;
+    const profile=getProfile();
+    const total=state.questions.length;
+    const correct=state.questions.reduce((sum,q,i)=>sum+(state.answers[i]&&state.answers[i].choice===q.c?1:0),0);
+    const earned=correct*10;
+    const today=new Date().toISOString().slice(0,10);
+    let bonus=0;
+    if(dailyMode && profile.lastDaily!==today){bonus=25;profile.lastDaily=today;profile.streak=(profile.streak||0)+1;}
+    else if(profile.lastDaily && profile.lastDaily!==today && profile.lastDaily!==new Date(Date.now()-86400000).toISOString().slice(0,10)){profile.streak=0;}
+    profile.xp=(profile.xp||0)+earned+bonus;
+    profile.name=state.name;
+    saveProfile(profile);
+    $("resultMessage").textContent += ` Kamu mendapat ${earned+bonus} XP${bonus? " (termasuk bonus tantangan harian +25 XP)":""}. Combo terbaik: ${bestCombo}.`;
+    if(window.quizOnlineSubmit){
+      window.quizOnlineSubmit({name:state.name,avatar:profile.avatar,score:Math.round(correct/total*100),difficulty:state.difficulty,category:state.category,xp:profile.xp,correct,total,playedAt:new Date().toISOString()});
+    }
+    currentCombo=0;bestCombo=0;
+    oldFinishQuiz();
+  };
+  renderProfile();
   renderLeaderboard();
   const saved = safeRead(STORAGE.progress, null);
   if (saved && saved.questions && saved.index < saved.questions.length) $("resumeBtn").classList.remove("hidden");
 })();
+</script>
+<script type="module">
+  // Firebase Web SDK: isi konfigurasi dari Firebase Console sebelum mengaktifkan leaderboard online.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "ISI_API_KEY",
+    authDomain: "ISI_PROJECT_ID.firebaseapp.com",
+    projectId: "ISI_PROJECT_ID",
+    storageBucket: "ISI_PROJECT_ID.appspot.com",
+    messagingSenderId: "ISI_MESSAGING_SENDER_ID",
+    appId: "ISI_APP_ID"
+  };
+  const configured = firebaseConfig.apiKey !== "ISI_API_KEY" && firebaseConfig.projectId !== "ISI_PROJECT_ID";
+  if (configured) {
+    try {
+      const app=initializeApp(firebaseConfig);
+      const db=getFirestore(app);
+      const auth=getAuth(app);
+      await signInAnonymously(auth);
+      window.quizOnlineSubmit=async data=>{
+        try {
+          await addDoc(collection(db,"quizScores"),{...data,uid:auth.currentUser?.uid||null,createdAt:serverTimestamp()});
+          document.getElementById("leaderboardStatus").textContent="Skor berhasil dikirim ke Firebase. Leaderboard online tersimpan.";
+          await loadOnlineBoard();
+        } catch(e){ console.error(e); document.getElementById("leaderboardStatus").textContent="Skor lokal tersimpan, tetapi Firebase menolak penyimpanan. Periksa Firestore Rules."; }
+      };
+      async function loadOnlineBoard(){
+        try{
+          const q=query(collection(db,"quizScores"),orderBy("score","desc"),limit(10));
+          const snap=await getDocs(q);
+          const list=document.getElementById("leaderboard");list.innerHTML="";
+          if(snap.empty){const li=document.createElement("li");li.className="empty";li.textContent="Belum ada skor online. Jadilah pemain pertama!";list.appendChild(li);return;}
+          snap.docs.forEach((doc,i)=>{
+            const d=doc.data();const li=document.createElement("li");
+            const name=document.createElement("span");name.textContent=`${d.avatar||"🎮"} #${i+1} ${d.name||"Pemain"}`;
+            const score=document.createElement("strong");score.textContent=`${Number(d.score)||0}%`;
+            li.append(name,score);list.appendChild(li);
+          });
+          document.getElementById("leaderboardStatus").textContent="Leaderboard online dari Firebase · 10 skor tertinggi.";
+        }catch(e){console.error(e);document.getElementById("leaderboardStatus").textContent="Tidak dapat membaca leaderboard online. Periksa Firestore Rules dan indeks."; }
+      }
+      await loadOnlineBoard();
+    } catch(e) {
+      console.error("Firebase belum siap:",e);
+      document.getElementById("leaderboardStatus").textContent="Firebase gagal diinisialisasi. Periksa konfigurasi, Authentication, dan koneksi.";
+    }
+  } else {
+    document.getElementById("leaderboardStatus").textContent="Mode lokal aktif. Isi konfigurasi Firebase dan aktifkan Anonymous Authentication + Firestore untuk leaderboard online.";
+  }
 </script>
   <!-- KONTAK SYAHRUL -->
 <section class="contact-section" id="kontak">
