@@ -412,5 +412,233 @@
   if (saved && saved.questions && saved.index < saved.questions.length) $("resumeBtn").classList.remove("hidden");
 })();
 </script>
+  <!-- KONTAK SYAHRUL -->
+<section class="contact-section" id="kontak">
+  <div class="contact-glow"></div>
+
+  <p class="contact-label">LET'S CONNECT</p>
+  <h2>Terhubung <span>Bersama Saya</span></h2>
+  <p class="contact-desc">
+    Terima kasih sudah mengunjungi Quiz Syahrul!
+    Hubungi saya atau ikuti media sosial saya.
+  </p>
+
+  <div class="contact-cards">
+    <a class="contact-card whatsapp"
+       href="https://wa.me/6281234567890"
+       target="_blank" rel="noopener noreferrer">
+      <div class="contact-icon">✆</div>
+      <div>
+        <h3>WhatsApp</h3>
+        <p>Chat langsung dengan saya</p>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+
+    <a class="contact-card instagram"
+       href="https://www.instagram.com/USERNAME_KAMU/"
+       target="_blank" rel="noopener noreferrer">
+      <div class="contact-icon">◎</div>
+      <div>
+        <h3>Instagram</h3>
+        <p>Ikuti aktivitas saya</p>
+      </div>
+      <span class="arrow">↗</span>
+    </a>
+  </div>
+
+  <div class="creator">
+    <span class="creator-dot"></span>
+    Website dibuat oleh <strong>Syahrul</strong>
+  </div>
+
+  <p class="copyright">
+    © 2026 Quiz Syahrul · Learn Technology, Have Fun.
+  </p>
+</section>
+
+<style>
+.contact-section {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 65px 20px 30px;
+  margin-top: 50px;
+  text-align: center;
+  color: #f1f5ff;
+  background: linear-gradient(145deg, #080d1c, #111832, #090d19);
+  border-top: 1px solid #29385b;
+  font-family: Arial, sans-serif;
+}
+
+.contact-glow {
+  position: absolute;
+  z-index: -1;
+  width: 280px;
+  height: 180px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #635bff;
+  filter: blur(100px);
+  opacity: .22;
+  pointer-events: none;
+}
+
+.contact-label {
+  color: #7cbbff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 4px;
+}
+
+.contact-section h2 {
+  font-size: clamp(26px, 5vw, 38px);
+  margin: 12px 0;
+}
+
+.contact-section h2 span {
+  color: #7c9dff;
+}
+
+.contact-desc {
+  max-width: 480px;
+  margin: 0 auto;
+  color: #aab5d0;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 240px));
+  justify-content: center;
+  gap: 16px;
+  margin: 30px auto;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 14px;
+  text-align: left;
+  color: white;
+  text-decoration: none;
+  background: #151e35;
+  border: 1px solid #344263;
+  border-radius: 16px;
+  transition: transform .25s, border-color .25s,
+              box-shadow .25s;
+  animation: contactIn .7s ease both;
+}
+
+.contact-card:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.contact-card:hover {
+  transform: translateY(-6px);
+  border-color: #849cff;
+  box-shadow: 0 10px 30px #647cff25;
+}
+
+.contact-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  font-size: 25px;
+  background: #243451;
+}
+
+.whatsapp .contact-icon {
+  color: #5af0a1;
+}
+
+.instagram .contact-icon {
+  color: #ff91d1;
+}
+
+.contact-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.contact-card p {
+  margin: 0;
+  font-size: 11px;
+  color: #aab5d0;
+  line-height: 1.5;
+}
+
+.arrow {
+  margin-left: auto;
+  color: #9aafff;
+  font-size: 20px;
+}
+
+.creator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: #b5bfd7;
+  font-size: 13px;
+  margin-top: 32px;
+}
+
+.creator strong {
+  color: #91a9ff;
+}
+
+.creator-dot {
+  width: 8px;
+  height: 8px;
+  background: #50e3a4;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #50e3a4;
+}
+
+.copyright {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #28334e;
+  color: #7987a6;
+  font-size: 11px;
+}
+
+@keyframes contactIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 520px) {
+  .contact-cards {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 340px;
+  }
+
+  .contact-section {
+    padding-top: 45px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card {
+    animation: none;
+    transition: none;
+  }
+}
+</style>
 </body>
 </html>
